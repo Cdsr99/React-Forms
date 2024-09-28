@@ -1,32 +1,42 @@
-import { useState } from "react";
 import { Button, Label, Fieldset, Input, Form, Titulo } from "../../components";
+import { useForm } from "react-hook-form";
 
 const CadastroPessoal = () => {
-  const [nome, setNome] = useState("");
-  const [email, setEmail] = useState("");
-  const [telefone, setTelefone] = useState("");
-  const [senha, setSenha] = useState("");
-  const [senhaVerificada, setSenhaVerificada] = useState("");
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    console.log({ nome, email, senha, telefone, senhaVerificada });
-  };
+  interface FormInputTipos {
+    nome: string;
+    email: string;
+    telefone: string;
+    senha: string;
+    senhaVerificada: string;
+  }
+
+  const { register, handleSubmit } = useForm<FormInputTipos>()
+
+  const aoSubmeter = (dados: FormInputTipos) => {
+    console.log(dados)
+  }
+
+  function validarEmail(valor: string){
+    const formatoEmail = /^[^\s@]+@alura\.com\.br$/;
+    if(!formatoEmail.test(valor)){
+      console.log("Endereço de email invalido");
+      return false;
+    }
+    return true;
+  }
 
   return (
     <>
       <Titulo>Insira alguns dados básicos:</Titulo>
-      <Form onSubmit={handleSubmit}>
+      <Form onSubmit={handleSubmit(aoSubmeter)}>
         <Fieldset>
           <Label htmlFor="campo-nome">Nome</Label>
           <Input
             id="campo-nome"
             placeholder="Digite seu nome completo"
             type="text"
-            value={nome}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setNome(e.target.value)
-            }
+            {...register("nome", {required: true, minLength: 5})}
           />
         </Fieldset>
         <Fieldset>
@@ -35,10 +45,7 @@ const CadastroPessoal = () => {
             id="campo-email"
             placeholder="Insira seu endereço de email"
             type="email"
-            value={email}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setEmail(e.target.value)
-            }
+            {...register("email", {required: true, validate: validarEmail})}
           />
         </Fieldset>
 
@@ -48,10 +55,7 @@ const CadastroPessoal = () => {
             id="campo-telefone"
             type="text"
             placeholder="Ex: (DDD) XXXXX-XXXX"
-            value={telefone}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setTelefone(e.target.value)
-            }
+            {...register("telefone", {required: true, pattern: /^\(\d{2,3}\) \d{5}-\d{4}$/})}
           />
         </Fieldset>
 
@@ -61,10 +65,7 @@ const CadastroPessoal = () => {
             id="campo-senha"
             placeholder="Crie uma senha"
             type="password"
-            value={senha}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setSenha(e.target.value)
-            }
+            {...register("senha")}
           />
         </Fieldset>
         <Fieldset>
@@ -73,10 +74,7 @@ const CadastroPessoal = () => {
             id="campo-senha-confirmacao"
             placeholder="Repita a senha anterior"
             type="password"
-            value={senhaVerificada}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setSenhaVerificada(e.target.value)
-            }
+            {...register("senhaVerificada")}
           />
         </Fieldset>
         <Button type="submit">Avançar</Button>
